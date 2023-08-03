@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/static/css/main.bd2f1dac.css",
+    "main.js": "/static/js/main.a65a1830.js",
+    "static/js/787.c4e7f8f9.chunk.js": "/static/js/787.c4e7f8f9.chunk.js",
+    "static/media/tienda.png": "/static/media/tienda.16b7933276de64d7e7bf.png",
+    "static/media/hella-sin-fondo.png": "/static/media/hella-sin-fondo.1d7b5499d5d36aae9242.png",
+    "static/media/image.png": "/static/media/image.0f74af526ffeb126190c.png",
+    "static/media/login.png": "/static/media/login.178c1fcda522b382a282.png",
+    "static/media/registro.png": "/static/media/registro.5a4341735d324306d5b7.png",
+    "static/media/calidad.png": "/static/media/calidad.b9a131aa7c59d72d37c8.png",
+    "index.html": "/index.html",
+    "main.bd2f1dac.css.map": "/static/css/main.bd2f1dac.css.map",
+    "main.a65a1830.js.map": "/static/js/main.a65a1830.js.map",
+    "787.c4e7f8f9.chunk.js.map": "/static/js/787.c4e7f8f9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.bd2f1dac.css",
+    "static/js/main.a65a1830.js"
+  ]
+}

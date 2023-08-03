@@ -1,0 +1,273 @@
+import React, { useState, useEffect } from "react";
+import AdminMenu from "../../components/Layout/AdminMenu";
+import Layout from "./../../components/Layout/Layout";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+
+const Products = () => {
+  const [products, setProducts] = useState([]);
+
+  //OBTENER TODOS LOS PRODUCTOS
+  const getAllProducts = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/get-product");
+      setProducts(data.products);
+    } catch (error) {
+      console.log(error);
+      toast.error("Ocurrio un error al traer los productos");
+    }
+  };
+
+  //CICLO DE VIDA 
+  useEffect(() => {
+    getAllProducts();
+  }, []);
+
+  return (
+    <Layout>
+      <div className="row container-fluid m-3 p-3 dashboard ">
+        <div className="col-md-3">
+          <AdminMenu />
+        </div>
+
+        <div className="col-md-8">
+          <h1>Todos los productos</h1>
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th style={{width: "80px"}} >Imagen</th>
+                  <th style={{width: "80px"}}>Nombre</th>
+                  <th style={{width: "80px"}}>Marca</th>
+                  <th style={{width: "80px"}} >Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products?.map((p) => (
+                  <tr key={p._id}>
+                    <td style={{width: "80px"}}>
+                      <img
+                        src={`/api/v1/product/product-photo/${p._id}`}
+                        height={"200px"}
+                        className="card-img-top"
+                        alt={p.name}
+                      />
+                    </td>
+                    <td style={{width: "80px"}}>{p.name}</td>
+                    <td style={{width: "80px"}}>{p.description}</td>
+                    <td style={{width: "80px"}}>
+                      <Link
+                        to={`/dashboard/admin/product/${p.slug}`}
+                        className="product-link"
+                      >
+                        <button className="btn btn-success">Ver</button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Products;
+
+import React, { useState, useEffect } from 'react';
+import { Table, Select, Button, Modal } from 'antd';
+import AdminMenu from '../../components/Layout/AdminMenu';
+import Layout from './../../components/Layout/Layout';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+import moment from 'moment';
+
+const { Option } = Select;
+
+const AdminOrders = () => {
+  const [status, setStatus] = useState([
+    'No procesada',
+    'Procesada',
+    'Enviada',
+    'Recibida',
+    'Cancelada',
+  ]);
+  const [changeStatus, setChangeStatus] = useState('');
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const getOrders = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get('/api/v1/auth/all-orders');
+      setOrders(data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      toast.error('Ocurrió un error al obtener las órdenes');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getOrders();
+  }, []);
+
+  const handleChange = async (orderId, value) => {
+    try {
+      setLoading(true);
+      await axios.put(`/api/v1/auth/order-status/${orderId}`, {
+        status: value,
+      });
+      getOrders();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setSelectedOrder(null);
+    setModalVisible(false);
+  };
+
+  const columns = [
+    {
+      title: '#',
+      dataIndex: '_id',
+      key: '_id',
+      render: (_, record, index) => index + 1,
+    },
+    
+    {
+      title: 'Cliente',
+      dataIndex: 'buyer',
+      key: 'buyer',
+      render: (buyer) => <span>{buyer?.name}</span>,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'buyer',
+      key: 'email',
+      render: (buyer) => <span>{buyer?.email}</span>,
+    },
+    {
+      title: 'Fecha',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (createdAt) => (
+        <span>{moment(createdAt).format('YYYY-MM-DD HH:mm:ss')}</span>
+      ),
+    },
+    {
+      title: 'Estado de pago',
+      dataIndex: 'payment',
+      key: 'success',
+      render: (payment) => (
+        <span>{payment?.success ? 'Pagada' : 'Sin pagar'}</span>
+      ),
+    },
+    {
+      title: 'Monto',
+      dataIndex: 'payment',
+      key: 'amount',
+      render: (payment) => (
+        <span>{payment?.transaction?.amount}</span>
+      ),
+    }, 
+    {
+      title: 'Productos',
+      key: 'products',
+      render: (text, record) => (
+        <Button className='status-select' onClick={() => handleViewOrder(record)}>
+          Ver productos
+        </Button>
+      ),
+    },
+    {
+      title: 'Cambiar Estado',
+      key: 'changeStatus',
+      render: (text, record) => (
+        <Select
+          defaultValue={record.status}
+          style={{ width: 120 }}
+          className='status-select'
+          onChange={(value) => handleChange(record._id, value)}
+        >
+          {status.map((s) => (
+            <Option key={s} value={s}>
+              {s}
+            </Option>
+          ))}
+        </Select>
+      ),
+    },
+  ];
+
+  return (
+    <Layout>
+      <div className="row container-fluid m-3 p-3 dashboard">
+        <div className="col-md-3">
+          <AdminMenu />
+        </div>
+        <div className="col-md-9">
+          <h1>Todas las órdenes</h1>
+          <Table
+            columns={columns}
+            rowKey={(record) => record._id}
+            dataSource={orders}
+            pagination={false}
+            loading={loading}
+          />
+        </div>
+      </div>
+      <Modal
+        visible={modalVisible}
+        onCancel={closeModal}
+        title="Detalles de la orden"
+        footer={[
+          <Button key="cerrar" onClick={closeModal}>
+            Cerrar
+          </Button>
+        ]}
+      >
+        {selectedOrder && (
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Producto</th>
+                <th scope="col">Talla</th>
+                <th scope="col">Precio</th>
+                <th scope="col">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedOrder.products.map((product, index) => (
+                <tr key={index}>
+                  <td>{product.name}</td>
+                  <td>{product.size}</td>
+                  <td>{product.price}</td>
+                  <td>{product.quantity}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Modal>
+    </Layout>
+  );
+};
+
+export default AdminOrders;
