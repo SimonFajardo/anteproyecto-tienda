@@ -9,5 +9,5 @@ Pasos a seguir para ejecutar la aplicación:
 Usuario administrador: simonfajardo7@gmail.com
 Contraseña administrador: Seff-214
 
-correo paypal sandbox: sb-kc47l126620510@business.example.com
-clave paypal sandbox: 4.Ay%>{n
+Correo paypal sandbox: sb-kc47l126620510@business.example.com
+Clave paypal sandbox: 4.Ay%>{n
